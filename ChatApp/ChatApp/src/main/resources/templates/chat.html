@@ -13,25 +13,70 @@
 
     <style>
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            align-items: center;
         }
 
         .chat-container {
-            max-width: 700px;
-            margin: 30px auto;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #4e54c8;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
         }
 
         .chat-box {
-            height: 400px;
+            height: 420px;
             overflow-y: auto;
-            background: white;
-            border: 1px solid #ddd;
             padding: 15px;
-            border-radius: 8px;
+            background: #f4f6fb;
         }
 
         .msg {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .bubble {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 15px;
+            background: #e1e5ff;
+            max-width: 70%;
+        }
+
+        .sender {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .input-area {
+            padding: 10px;
+            background: #f1f1f1;
+        }
+
+        input {
+            border-radius: 20px !important;
+        }
+
+        button {
+            border-radius: 20px !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(5px); }
+            to { opacity:1; transform:translateY(0); }
         }
     </style>
 </head>
@@ -40,36 +85,39 @@
 
 <div class="container chat-container">
 
-    <h2 class="text-center mb-3">STPBot Chat App</h2>
-
-    <!-- Chat box -->
-    <div class="chat-box mb-2" id="chatBox"></div>
-
-    <!-- Input row -->
-    <div class="row">
-
-        <div class="col-md-3 mb-2">
-            <input id="username" type="text"
-                   class="form-control"
-                   placeholder="Your Name">
-        </div>
-
-        <div class="col-md-7 mb-2">
-            <input id="message"
-                   type="text"
-                   class="form-control"
-                   placeholder="Type message..."
-                   onkeydown="if(event.key==='Enter') sendMessage()">
-        </div>
-
-        <div class="col-md-2 mb-2 d-grid">
-            <button class="btn btn-primary"
-                    onclick="sendMessage()">
-                Send
-            </button>
-        </div>
-
+    <div class="chat-header">
+        💬 STPBot Chat App
     </div>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="input-area">
+        <div class="row g-2">
+
+            <div class="col-md-3">
+                <input id="username" type="text"
+                       class="form-control"
+                       placeholder="Your Name">
+            </div>
+
+            <div class="col-md-7">
+                <input id="message"
+                       type="text"
+                       class="form-control"
+                       placeholder="Type message..."
+                       onkeydown="if(event.key==='Enter') sendMessage()">
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary"
+                        onclick="sendMessage()">
+                    Send
+                </button>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -97,7 +145,7 @@
     function sendMessage() {
 
         if (!connected) {
-            alert("Still connecting, try again...");
+            alert("Still connecting...");
             return;
         }
 
@@ -121,16 +169,18 @@
         let msgDiv = document.createElement('div');
         msgDiv.className = "msg";
 
-        msgDiv.innerHTML =
-            "<b>" + message.sender + ":</b> " + message.content;
+        msgDiv.innerHTML = `
+            <div class="bubble">
+                <div class="sender">${message.sender}</div>
+                ${message.content}
+            </div>
+        `;
 
         chatBox.appendChild(msgDiv);
-
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
 </script>
-
 
 </body>
 </html>
