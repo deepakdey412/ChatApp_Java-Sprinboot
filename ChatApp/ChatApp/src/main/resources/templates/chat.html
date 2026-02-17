@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>STPBot Chat App</title>
+    <title>ChatApp</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -13,83 +13,84 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #141e30, #243b55);
-            height: 100vh;
+            margin: 0;
+            background: #d9d9d9;
             display: flex;
+            justify-content: center;
             align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
         }
 
-        .chat-container {
-            max-width: 850px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            color: white;
+        /* Phone frame */
+        .phone {
+            width: 390px;
+            height: 780px;
+            background: #f2f2f2;
+            border-radius: 35px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,.25);
         }
 
+        /* Header */
         .chat-header {
-            background: rgba(0,0,0,0.3);
+            background: #ffffff;
             padding: 15px;
-            font-size: 20px;
             text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
         }
 
+        /* Chat area */
         .chat-box {
-            height: 420px;
+            flex: 1;
             overflow-y: auto;
             padding: 15px;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Message bubble */
         .msg {
-            margin-bottom: 10px;
-            animation: fadeIn .3s;
-        }
-
-        .bubble {
-            display: inline-block;
+            margin-bottom: 8px;
+            max-width: 70%;
             padding: 10px 14px;
             border-radius: 15px;
-            background: rgba(255,255,255,0.2);
-            max-width: 70%;
+            animation: fadeIn .2s ease;
         }
 
-        .sender {
-            font-weight: bold;
-            font-size: 14px;
+        .received {
+            background: #e2e2e2;
+            align-self: flex-start;
         }
 
-        .input-area {
-            background: rgba(0,0,0,0.3);
+        .sent {
+            background: #0d6efd;
+            color: white;
+            align-self: flex-end;
+        }
+
+        /* Input bar */
+        .chat-input {
             padding: 10px;
+            background: white;
+            border-top: 1px solid #ddd;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
         }
 
         input {
+            flex: 1;
             border-radius: 20px !important;
         }
 
         button {
             border-radius: 20px !important;
-        }
-
-        /* Emoji panel */
-        .emoji-panel {
-            display: none;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            position: absolute;
-            bottom: 70px;
-            right: 20px;
-            width: 260px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .emoji-panel span {
-            cursor: pointer;
-            font-size: 20px;
-            padding: 5px;
         }
 
         @keyframes fadeIn {
@@ -101,45 +102,30 @@
 
 <body onload="connect()">
 
-<div class="container chat-container">
+<div class="phone">
 
+    <!-- Header -->
     <div class="chat-header">
-        💬 STPBot Chat App
+        ChatApp
     </div>
 
+    <!-- Messages -->
     <div class="chat-box" id="chatBox"></div>
 
-    <div class="input-area position-relative">
-        <div class="row g-2">
+    <!-- Input -->
+    <div class="chat-input">
+        <div class="input-row">
+            <input id="username"
+                   class="form-control"
+                   placeholder="Name">
 
-            <div class="col-md-3">
-                <input id="username" type="text"
-                       class="form-control"
-                       placeholder="Your Name">
-            </div>
+            <input id="message"
+                   class="form-control"
+                   placeholder="Type message..."
+                   onkeydown="if(event.key==='Enter') sendMessage()">
 
-            <div class="col-md-6">
-                <input id="message"
-                       type="text"
-                       class="form-control"
-                       placeholder="Type message..."
-                       onkeydown="if(event.key==='Enter') sendMessage()">
-            </div>
-
-            <div class="col-md-1 d-grid">
-                <button class="btn btn-light"
-                        onclick="toggleEmoji()">😀</button>
-            </div>
-
-            <div class="col-md-2 d-grid">
-                <button class="btn btn-primary"
-                        onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-
-        <!-- Emoji panel -->
-        <div class="emoji-panel" id="emojiPanel">
-            😀 😁 😂 🤣 😍 😎 😢 😡 👍 👏 🙌 ❤️ 🔥 🎉 🚀 🤖 😴 🤩
+            <button class="btn btn-primary"
+                    onclick="sendMessage()">Send</button>
         </div>
     </div>
 
@@ -163,11 +149,10 @@
     }
 
     function sendMessage() {
-
         if (!connected) return;
 
-        let username = usernameInput().value.trim();
-        let message = messageInput().value.trim();
+        let username = document.getElementById('username').value.trim();
+        let message = document.getElementById('message').value.trim();
 
         if (!username || !message) return;
 
@@ -176,48 +161,25 @@
             content: message
         }));
 
-        messageInput().value = "";
+        document.getElementById('message').value = "";
     }
 
     function showMessage(message) {
         let chatBox = document.getElementById('chatBox');
 
         let msgDiv = document.createElement('div');
-        msgDiv.className = "msg";
 
-        msgDiv.innerHTML = `
-            <div class="bubble">
-                <div class="sender">${message.sender}</div>
-                ${message.content}
-            </div>
-        `;
+        let myName = document.getElementById('username').value.trim();
+
+        msgDiv.className = "msg " +
+            (message.sender === myName ? "sent" : "received");
+
+        msgDiv.innerHTML =
+            `<b>${message.sender}:</b> ${message.content}`;
 
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
-
-    function usernameInput() {
-        return document.getElementById('username');
-    }
-
-    function messageInput() {
-        return document.getElementById('message');
-    }
-
-    /* Emoji Handling */
-    function toggleEmoji() {
-        let panel = document.getElementById('emojiPanel');
-        panel.style.display =
-            panel.style.display === "block" ? "none" : "block";
-    }
-
-    document.getElementById('emojiPanel')
-        .addEventListener('click', function(e) {
-            if (e.target.tagName === "SPAN" || e.target.nodeType === 3) {
-                messageInput().value += e.target.textContent.trim();
-                messageInput().focus();
-            }
-        });
 </script>
 
 </body>
